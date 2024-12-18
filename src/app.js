@@ -1,6 +1,7 @@
 const express = require("express");
 const usersRouter = require("./routes/Users.js");
 const projectsRouter = require("./routes/Projects.js");
+const tasksRouter = require("./routes/Tasks.js");
 const morgan = require('morgan');
 const cors = require('cors');
 const session = require('express-session');
@@ -37,6 +38,7 @@ server.use(session({
 
 server.use("/users", usersRouter);
 server.use("/projects", projectsRouter);
+server.use("/tasks", tasksRouter )
 
 
 
