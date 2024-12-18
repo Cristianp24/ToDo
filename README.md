@@ -30,9 +30,9 @@ Config
 
 Create an .env file at the root of the project and add the following variables:
 
-PORT=3000
-MONGO_URI=mongodb://localhost:27017/nombre-de-la-base-de-datos
-JWT_SECRET=tu-secreto-jwt
+PORT=
+MONGO_URI=
+JWT_SECRET=
 
 Ejecute
 
