@@ -7,7 +7,7 @@ const createUserAndTask = async (req, res) => {
   session.startTransaction();
 
   try {
-    const user = new User({ name: 'Nuevo Usuario', email: 'usuario@example.com', password: 'contraseña' });
+    const user = new User({ name: req.body.name, email: req.body.email, password: req.body.password });
     await user.save({ session });
 
     const task = new Task({ name: 'Nueva Tarea', project:"67627cdbf92580f2514154dc" ,description: 'Descripción de la tarea', userId: "67627cdbf92580f2514154dc" });

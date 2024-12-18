@@ -46,6 +46,11 @@ To start the server in porduction mode:
 npm start 
 
 
+## Documentation Api
+
+localhost:3000/api-docs ||  All documentation with Swagger UI
+
+
 
 
 
