@@ -6,6 +6,7 @@ const morgan = require('morgan');
 const cors = require('cors');
 const session = require('express-session');
 const cookieParser = require("cookie-parser");
+const errorHandler = require('./middlewares/errorHandler.js');
 
 require('dotenv').config();
 
@@ -13,11 +14,7 @@ require('dotenv').config();
 
 const server = express();
 
-
-const myOwnMiddleware = (req, res, next) => {
-    console.log("Middleware serverlied!!");
-    next();
-};
+server.use(errorHandler)
 
 server.use(cookieParser());
 
@@ -27,7 +24,7 @@ server.use(cors());
 // Configuración básica de express
 server.use(express.json());
 server.use(morgan('dev'));
-server.use(myOwnMiddleware);
+server.use(errorHandler);
 
 // Configuración de la sesión
 server.use(session({
