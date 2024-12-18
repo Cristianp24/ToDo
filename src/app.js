@@ -7,6 +7,9 @@ const cors = require('cors');
 const session = require('express-session');
 const cookieParser = require("cookie-parser");
 const errorHandler = require('./middlewares/errorHandler.js');
+const swaggerUi = require('swagger-ui-express');
+const specs = require('./swagger/swagger.js');
+
 
 require('dotenv').config();
 
@@ -14,10 +17,8 @@ const server = express();
 
 server.use(cookieParser());
 server.use(cors());
-
 server.use(express.json());
 server.use(morgan('dev'));
-
 server.use(session({
     secret: process.env.JWT_SECRET,
     resave: false,
@@ -26,7 +27,9 @@ server.use(session({
 
 server.use("/users", usersRouter);
 server.use("/projects", projectsRouter);
-server.use("/tasks", tasksRouter )
+server.use("/tasks", tasksRouter );
+
+server.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs)) 
 
 server.use(errorHandler)
 
