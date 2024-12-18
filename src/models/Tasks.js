@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const taskSchema = new mongoose.Schema({
-  taskId: { type: String, required: true },
+  taskId: { type: String, required: true, default: () => Math.random().toString(36).substring(2, 9) },
   name: { type: String, required: true },
   description: { type: String },
   status: { type: String, enum: ['pending', 'in progress', 'complete'], default: 'pending' },
