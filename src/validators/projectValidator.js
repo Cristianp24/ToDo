@@ -28,12 +28,9 @@ const updateProjectValidator = [
 ];
 
 const assignUserToProjectValidator = [
-    // Validar que 'userId' en el cuerpo de la solicitud es un ID de MongoDB válido
     body('userId')
       .isMongoId()
       .withMessage('El ID de usuario proporcionado no es válido'),
-  
-    // Validar que 'id' en los parámetros de la URL es un ID de MongoDB válido
     param('id')
       .isMongoId()
       .withMessage('El ID del proyecto proporcionado no es válido'),

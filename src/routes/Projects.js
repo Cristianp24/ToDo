@@ -1,9 +1,8 @@
 const { Router } = require("express");
 const { registerProject, getProjects, updateProject, deleteProject, assignUserToProject } = require("../controllers/Projects");
 const { createProjectValidator, updateProjectValidator, assignUserToProjectValidator } = require('../validators/projectValidator');
+
 const router = Router();
-
-
 
 router.post("/", createProjectValidator,registerProject);
 router.get("/", getProjects);

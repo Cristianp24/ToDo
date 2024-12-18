@@ -1,8 +1,8 @@
 // src/controllers/userController.js
-const { validationResult } = require('express-validator');
+const errorsValidator = require('../validators/errorsValidator');
 const User = require('../models/Users');
 const jwt = require('jsonwebtoken'); // Para crear el token
-
+const CustomError = require('../middlewares/customError');
 
 
 const getUsers = async (req, res) => {
@@ -14,91 +14,63 @@ const getUsers = async (req, res) => {
   }
 };
 
-const registerUser = async (req, res) => {
-  // Validar los datos de entrada
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
-  const { name, email, password } = req.body;
-
+const registerUser = async (req, res, next) => {
   try {
-    // Verificar si el usuario ya existe
+    errorsValidator(req);
+    const { name, email, password } = req.body;
+
     const userExists = await User.findOne({ email });
     if (userExists) {
-      return res.status(400).json({ message: 'El usuario ya existe' });
+      throw new CustomError('El usuario ya existe', 400);
     }
 
-    // Crear un nuevo usuario
-    const user = new User({
-      name,
-      email,
-      password,
-    });
-
-    // Guardar el usuario en la base de datos
+    const user = new User({ name, email, password });
     await user.save();
 
-    // Generar el token JWT
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-      expiresIn: '1h', // El token expira en 1 hora
+      expiresIn: '1h',
     });
-
-    // Responder con el token
     res.status(201).json({
       message: 'Usuario registrado con éxito',
       token,
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Error en el servidor' });
+    next(error);
   }
 };
 
-const loginUser = async (req, res) => {
-  // Validar los datos de entrada
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
-  const { email, password } = req.body;
-
+const loginUser = async (req, res, next) => {
   try {
-    // Buscar al usuario por email
+    errorsValidator(req);
+    const { email, password } = req.body;
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(400).json({ message: 'Usuario no encontrado' });
+      throw new CustomError('Usuario no encontrado', 400);
     }
-
-    // Comparar la contraseña
     const isMatch = await user.matchPassword(password);
     if (!isMatch) {
-      return res.status(400).json({ message: 'Contraseña incorrecta' });
+      throw new CustomError('Contraseña incorrecta', 400);
     }
-
-    // Generar el token JWT
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-      expiresIn: '1h', // El token expira en 1 hora
+      expiresIn: '1h',
     });
-
-    // Responder con el token
     res.json({
       message: 'Inicio de sesión exitoso',
       token,
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Error en el servidor' });
+    next(error);
   }
 };
 
-   const logoutUser = (req, res) => {
+const logoutUser = (req, res, next) => {
+  try {
     res.clearCookie("authToken");
-    return res.json({ message: "Logout successful" });
-  };
-
+    res.json({ message: "Logout successful" });
+  } catch (error) {
+    next(new CustomError('Error al cerrar sesión', 500));
+  }
+};
 
 module.exports = {
   registerUser,
