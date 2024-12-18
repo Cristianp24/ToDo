@@ -3,7 +3,18 @@ const { validationResult } = require('express-validator');
 const User = require('../models/Users');
 const jwt = require('jsonwebtoken'); // Para crear el token
 
-// Registrar un nuevo usuario
+
+
+const getUsers = async (req, res) => {
+  try {
+    const users = await User.find();
+    res.status(200).json(users);
+  } catch (error) {
+    console.error('Error al obtener los usuarios:', error);
+    res.status(500).json({ message: 'Error al obtener los usuarios' });
+  }
+};
+
 const registerUser = async (req, res) => {
   // Validar los datos de entrada
   const errors = validationResult(req);
@@ -93,5 +104,6 @@ const loginUser = async (req, res) => {
 module.exports = {
   registerUser,
   loginUser,
-  logoutUser
+  logoutUser,
+  getUsers
 };
