@@ -15,10 +15,15 @@ const createUserAndTask = async (req, res) => {
 
     await session.commitTransaction();
     res.status(201).json({ message: 'Usuario y tarea creados exitosamente' });
-  } catch (error) {
+  }  catch (error) {
     await session.abortTransaction();
-    console.error('Error en la transacción:', error);
-    res.status(500).json({ error: 'Error al crear usuario y tarea' });
+    if (error.code === 11000) {
+      // Error de clave duplicada
+      res.status(400).json({ error: 'El correo electrónico ya está en uso.' });
+    } else {
+      console.error('Error en la transacción:', error);
+      res.status(500).json({ error: 'Error al crear usuario y tarea' });
+    }
   } finally {
     session.endSession();
   }
