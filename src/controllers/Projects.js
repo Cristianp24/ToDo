@@ -1,39 +1,38 @@
 const Project = require('../models/Projects');
-
+const { validationResult } = require('express-validator');
 
 const registerProject = async (req, res) => {
-    const { name, description, user } = req.body;
-  
-    // Validación básica de los datos requeridos
-    if (!name || !description || !user) {
-      return res.status(400).json({
-        error: 'Por favor, proporciona un nombre, una descripción y un ID de usuario válido.',
-      });
-    }
-  
-    try {
-      // Crear una nueva instancia del proyecto
-      const newProject = new Project({
-        name,
-        description,
-        user, // ID del usuario relacionado
-      });
-  
-      // Guardar el proyecto en la base de datos
-      const savedProject = await newProject.save();
-  
-      // Respuesta exitosa
-      res.status(201).json({
-        message: 'Proyecto creado con éxito',
-        project: savedProject,
-      });
-    } catch (error) {
-      console.error('Error al crear el proyecto:', error);
-      res.status(500).json({
-        error: 'Hubo un problema al crear el proyecto.',
-      });
-    }
-  };
+  // Verificar si hay errores de validación
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  const { name, description, user } = req.body;
+
+  try {
+    // Crear una nueva instancia del proyecto
+    const newProject = new Project({
+      name,
+      description,
+      user, // ID del usuario relacionado
+    });
+
+    // Guardar el proyecto en la base de datos
+    const savedProject = await newProject.save();
+
+    // Respuesta exitosa
+    res.status(201).json({
+      message: 'Proyecto creado con éxito',
+      project: savedProject,
+    });
+  } catch (error) {
+    console.error('Error al crear el proyecto:', error);
+    res.status(500).json({
+      error: 'Hubo un problema al crear el proyecto.',
+    });
+  }
+};
 
   const getProjects = async (req, res) => {
     try {
@@ -49,6 +48,12 @@ const registerProject = async (req, res) => {
   const updateProject = async (req, res) => {
     const { id } = req.params;
     const { name, description } = req.body;
+  
+    // Verificar si hay errores de validación
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
   
     try {
       const updatedProject = await Project.findByIdAndUpdate(
@@ -86,6 +91,12 @@ const registerProject = async (req, res) => {
   };
 
   const assignUserToProject = async (req, res) => {
+    // Verificar si hay errores de validación
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+  
     const { id } = req.params; // ID del proyecto
     const { userId } = req.body; // ID del usuario a asignar
   
@@ -105,7 +116,6 @@ const registerProject = async (req, res) => {
       res.status(500).json({ message: 'Error al asignar usuario al proyecto' });
     }
   };
-
   
 
   module.exports = {
