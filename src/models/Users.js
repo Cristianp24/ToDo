@@ -4,9 +4,11 @@ const bcrypt = require('bcryptjs'); // Para encriptar la contraseña
 
 const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
+  email: { type: String, required: true, },
   password: { type: String, required: true },
 }, { timestamps: true });
+
+userSchema.index({ name: 1, email: 1 });
 
 userSchema.pre('save', async function(next) {
   if (!this.isModified('password')) return next();

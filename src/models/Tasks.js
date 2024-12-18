@@ -9,6 +9,9 @@ const taskSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: false },
   project: { type: mongoose.Schema.Types.ObjectId, ref: 'Project', required: true }
 });
+
+taskSchema.index({ status: 1, dueDate: 1 });
+
   const Task = mongoose.model('Task', taskSchema);
 
   module.exports =  Task ;

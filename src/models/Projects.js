@@ -7,6 +7,8 @@ const projectSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
 }, { timestamps: true });
 
+projectSchema.index({ name: 1, description: 1 });
+
 const Project = mongoose.model('Project', projectSchema);
 
 module.exports =  Project ;
