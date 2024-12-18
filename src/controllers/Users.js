@@ -10,7 +10,6 @@ const getUsers = async (req, res) => {
     const users = await User.find();
     res.status(200).json(users);
   } catch (error) {
-    console.error('Error al obtener los usuarios:', error);
     res.status(500).json({ message: 'Error al obtener los usuarios' });
   }
 };
@@ -58,42 +57,42 @@ const registerUser = async (req, res) => {
 };
 
 const loginUser = async (req, res) => {
-    // Validar los datos de entrada
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+  // Validar los datos de entrada
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  const { email, password } = req.body;
+
+  try {
+    // Buscar al usuario por email
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: 'Usuario no encontrado' });
     }
-  
-    const { email, password } = req.body;
-  
-    try {
-      // Buscar al usuario por email
-      const user = await User.findOne({ email });
-      if (!user) {
-        return res.status(400).json({ message: 'Usuario no encontrado' });
-      }
-  
-      // Comparar la contraseña
-      const isMatch = await user.matchPassword(password);
-      if (!isMatch) {
-        return res.status(400).json({ message: 'Contraseña incorrecta' });
-      }
-  
-      // Generar el token JWT
-      const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-        expiresIn: '1h', // El token expira en 1 hora
-      });
-  
-      // Responder con el token
-      res.json({
-        message: 'Inicio de sesión exitoso',
-        token,
-      });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Error en el servidor' });
+
+    // Comparar la contraseña
+    const isMatch = await user.matchPassword(password);
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Contraseña incorrecta' });
     }
-  };
+
+    // Generar el token JWT
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+      expiresIn: '1h', // El token expira en 1 hora
+    });
+
+    // Responder con el token
+    res.json({
+      message: 'Inicio de sesión exitoso',
+      token,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error en el servidor' });
+  }
+};
 
    const logoutUser = (req, res) => {
     res.clearCookie("authToken");
