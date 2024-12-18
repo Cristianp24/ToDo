@@ -4,12 +4,10 @@ const morgan = require('morgan');
 const cors = require('cors');
 const session = require('express-session');
 const cookieParser = require("cookie-parser");
-const passportConfig = require('./config/passportConfig.js');
-const passport = require('passport');
+
 require('dotenv').config();
 
 
-require("./config/db.js");
 
 const server = express();
 
@@ -31,16 +29,10 @@ server.use(myOwnMiddleware);
 
 // Configuración de la sesión
 server.use(session({
-    secret: process.env.JWT_SECRET, // Cambia esto a una clave secreta segura
+    secret: process.env.JWT_SECRET,
     resave: false,
     saveUninitialized: true,
 }));
-
-server.use(passport.initialize());
-server.use(passport.session());
-
-// // Configuración de passport
-passportConfig(passport);
 
 server.use("/users", usersRouter);
 

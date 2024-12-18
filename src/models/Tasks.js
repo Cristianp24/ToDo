@@ -7,6 +7,7 @@ const taskSchema = new mongoose.Schema({
     project: { type: mongoose.Schema.Types.ObjectId, ref: 'Project', required: true }, // Relación con Proyecto
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Relación con Usuario
     status: { type: String, enum: ['pending', 'in-progress', 'completed'], default: 'pending' },
+    assignedTo: {type: mongoose.Schema.Types.ObjectId,ref: 'User',required: false,},
     createdAt: { type: Date, default: Date.now },
   }, { timestamps: true });
   
