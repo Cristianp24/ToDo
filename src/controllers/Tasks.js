@@ -1,10 +1,16 @@
 const Task = require("../models/Tasks");
-
+const { validationResult } = require('express-validator');
 
 const createTask = async (req, res) => {
+  // Verificar si hay errores de validación
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   try {
     const { name, description, status, dueDate, userId, projectId } = req.body;
-  
+
     const newTask = new Task({
       name,
       description,
@@ -34,9 +40,13 @@ const getTasks = async (req, res) => {
 };
 
 const updateTask = async (req, res) => {
+  // Verificar si hay errores de validación
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   const { taskId } = req.params;
-  console.log('Task ID:', taskId);
-  
   const { name, description, status, dueDate } = req.body;
 
   // Construir el objeto de actualización solo con los campos proporcionados
@@ -45,8 +55,6 @@ const updateTask = async (req, res) => {
   if (description !== undefined) updateData.description = description;
   if (status !== undefined) updateData.status = status;
   if (dueDate !== undefined) updateData.dueDate = dueDate;
-
-  console.log('Datos a actualizar:', updateData);
 
   try {
     const updatedTask = await Task.findByIdAndUpdate(taskId, updateData, { new: true });
