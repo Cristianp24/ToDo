@@ -63,15 +63,3 @@ run script for run tests : npm test
 
 
 
-
-localhost:3000/tasks/filter/?status=complete
-
-localhost:3000/tasks/filter?dueDate=2024-12-25
-
-localhost:3000/tasks/filter?user=6762549451367a8a8db5adca
-
-localhost:3000/tasks/search?query=Descripción || localhost:3000/tasks/search?query=nombre
-
-
-
-
