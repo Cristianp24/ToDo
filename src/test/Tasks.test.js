@@ -144,4 +144,47 @@ describe('Task Management API', () => {
         expect(response.body.message).toContain('Errores de validación');
       });
     });
+    describe('GET /tasks/search?query', () => {
+        test('debería devolver tareas que coincidan con el nombre', async () => {
+          const response = await request(app)
+            .get('/tasks/search?query=Test')
+            .expect(200);
+    
+          expect(response.body).toBeInstanceOf(Array);
+          expect(response.body.length).toBeGreaterThan(0);
+    
+          const taskResponse = response.body[0];
+          expect(taskResponse.name).toMatch(/Test/i);
+        });
+  
+        test('debería devolver tareas que coincidan con la descripción', async () => {
+          const response = await request(app)
+            .get('/tasks/search?query=description')
+            .expect(200);
+  
+          expect(response.body).toBeInstanceOf(Array);
+          expect(response.body.length).toBeGreaterThan(0);
+  
+          const taskResponse = response.body[0];
+          expect(taskResponse.description).toMatch(/description/i);
+        });
+  
+        test('debería retornar un error si no se encuentra ninguna tarea', async () => {
+          const response = await request(app)
+            .get('/tasks/search?query=nonexistent')
+            .expect(404);
+  
+          expect(response.body.message).toBe('No se encontraron coincidencias para el término de búsqueda proporcionado.');
+        });
+  
+        test('debería retornar un error si no se proporciona un término de búsqueda', async () => {
+          const response = await request(app)
+            .get('/tasks/search')
+            .expect(400);
+  
+          expect(response.body.message).toBe('Se requiere un término de búsqueda.');
+        });
+      });
   });
+  
+  
