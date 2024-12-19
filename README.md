@@ -42,13 +42,24 @@ npm run dev
 
 To start the server in porduction mode:
 
-
 npm start 
+
+To start the server for see changes in live (like nodemon) :
+
+node --watch index.js
 
 
 ## Documentation Api
 
-localhost:3000/api-docs ||  All documentation with Swagger UI
+All documentation with Swagger UI
+
+https://todo-restapi-za6s.onrender.com/api-docs || localhost:3000/api-docs
+
+Aditional endpoints for search by page: 
+
+ https://todo-restapi-za6s.onrender.com/projects?page=3 || localhost:3000/projects?page=3
+ https://todo-restapi-za6s.onrender.com/tasks?page=3    || localhost:3000/tasks?page=3 
+ https://todo-restapi-za6s.onrender.com/users?page=3    || localhost:3000/users?page=3
 
 
 ## Test 
