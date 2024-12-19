@@ -51,7 +51,12 @@ npm start
 localhost:3000/api-docs ||  All documentation with Swagger UI
 
 
+## Test 
 
+Download MongoDB Local for Tests from https://www.mongodb.com/try/download/community
+Create db_test local for tests
+
+run script for run tests : npm test
 
 
 
