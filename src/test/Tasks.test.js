@@ -185,6 +185,74 @@ describe('Task Management API', () => {
           expect(response.body.message).toBe('Se requiere un término de búsqueda.');
         });
       });
+      describe('GET /tasks/filter', () => {
+        test('debería filtrar tareas por status correctamente', async () => {
+          const response = await request(app)
+            .get('/tasks/filter?status=pending')
+            .expect(200);
+      
+          expect(response.body).toBeInstanceOf(Array);
+          expect(response.body.length).toBeGreaterThan(0);
+      
+          // Verificar que todas las tareas retornadas tengan el status correcto
+          response.body.forEach((task) => {
+            expect(task.status).toBe('pending');
+          });
+        });
+        test('debería filtrar tareas por dueDate correctamente', async () => {
+            const date = '2024-12-25'; // Fecha límite que proporcionamos en la consulta
+            const response = await request(app)
+              .get(`/tasks/filter?dueDate=${date}`)
+              .expect(200);
+          
+            expect(response.body).toBeInstanceOf(Array);
+            expect(response.body.length).toBeGreaterThan(0);
+          
+            // Verificar que todas las tareas retornadas tengan la dueDate correcta
+            response.body.forEach((task) => {
+              const taskDueDate = new Date(task.dueDate);
+              // Comparamos la fecha de la tarea con la fecha proporcionada, asegurándonos de que sea menor o igual al final del día
+              const providedDate = new Date(date);
+              providedDate.setHours(23, 59, 59, 999); // Aseguramos que la fecha proporcionada tenga el valor máximo de hora
+              expect(taskDueDate <= providedDate).toBe(true);
+            });
+          });
+        test('debería filtrar tareas por user correctamente', async () => {
+          const userId = user._id.toString(); // Usando el ID del usuario creado en el beforeAll
+          const response = await request(app)
+            .get(`/tasks/filter?user=${userId}`)
+            .expect(200);
+      
+          expect(response.body).toBeInstanceOf(Array);
+          expect(response.body.length).toBeGreaterThan(0);
+      
+          // Verificar que todas las tareas retornadas pertenezcan al usuario correcto
+          response.body.forEach((task) => {
+            expect(task.user._id.toString()).toBe(userId);
+          });
+        });
+      
+        test('debería retornar un error si no se pasan parámetros de filtro', async () => {
+          const response = await request(app)
+            .get('/tasks/filter')
+            .expect(400);
+      
+          expect(response.body.message).toBe(
+            'Se requieren parámetros de filtro: status, dueDate o user.'
+          );
+        });
+      
+        test('debería retornar un error si no se encuentran tareas que coincidan con los filtros', async () => {
+          const invalidUserId = new mongoose.Types.ObjectId(); // Un ID de usuario inexistente
+          const response = await request(app)
+            .get(`/tasks/filter?user=${invalidUserId}`)
+            .expect(404);
+      
+          expect(response.body.message).toBe(
+            'No se encontraron tareas que coincidan con los filtros proporcionados.'
+          );
+        });
+      });
   });
   
   
