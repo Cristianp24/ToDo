@@ -6,6 +6,7 @@ const transactionRoutes = require("./routes/transactionRoutes.js");
 const morgan = require('morgan');
 const cors = require('cors');
 const session = require('express-session');
+const MongoStore = require('connect-mongo');
 const cookieParser = require("cookie-parser");
 const errorHandler = require('./middlewares/errorHandler.js');
 const swaggerUi = require('swagger-ui-express');
@@ -24,7 +25,11 @@ server.use(session({
     secret: process.env.JWT_SECRET,
     resave: false,
     saveUninitialized: true,
-}));
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGO_URI,  // Asegúrate de usar la URI correcta de MongoDB Atlas
+      collectionName: 'sessions'
+    }),
+  }));
 
 server.use("/users", usersRouter);
 server.use("/projects", projectsRouter);
