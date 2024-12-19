@@ -51,7 +51,6 @@ describe('Task Management API', () => {
         expect(taskResponse.project).toHaveProperty('name', 'Test Project');
       });
     });
-  
     // --- TEST: POST /tasks ---
     describe('POST /tasks', () => {
       test('debería crear una tarea correctamente', async () => {
@@ -193,7 +192,7 @@ describe('Task Management API', () => {
       
           expect(response.body).toBeInstanceOf(Array);
           expect(response.body.length).toBeGreaterThan(0);
-      
+  
           // Verificar que todas las tareas retornadas tengan el status correcto
           response.body.forEach((task) => {
             expect(task.status).toBe('pending');
@@ -254,5 +253,4 @@ describe('Task Management API', () => {
         });
       });
   });
-  
   
