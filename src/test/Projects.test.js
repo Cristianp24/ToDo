@@ -6,10 +6,7 @@ const User = require('../models/Users');
 
 // Setup para limpiar la base de datos entre tests
 beforeAll(async () => {
-  await mongoose.connect('mongodb://localhost:27017/yourTestDatabase', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
+  await mongoose.connect('mongodb://localhost:27017/yourTestDatabase');
 });
 
 afterAll(async () => {
