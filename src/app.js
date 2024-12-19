@@ -17,6 +17,10 @@ require('dotenv').config();
 
 const server = express();
 
+server.get("/", (req, res) => {
+  res.send("BIENVENIDOS A MI RESTAPI DE GESTION DE TAREAS, PRUEBA TECNICA DE BACKEND");
+});
+
 server.use(cookieParser());
 server.use(cors());
 server.use(express.json());
