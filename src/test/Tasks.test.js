@@ -36,19 +36,60 @@ describe('Task Management API', () => {
   
     // --- TEST: GET /tasks ---
     describe('GET /tasks', () => {
-      test('debería retornar todas las tareas con los datos de usuario y proyecto', async () => {
-        const response = await request(app).get('/tasks').expect(200);
-  
-        expect(response.body).toBeInstanceOf(Array);
-        expect(response.body.length).toBeGreaterThan(0);
-  
-        const taskResponse = response.body[0];
-        expect(taskResponse).toHaveProperty('name', 'Test Task');
+      test('debería retornar las tareas con los datos de usuario y proyecto con paginación', async () => {
+        // Crear algunas tareas de prueba en la base de datos
+        const task1 = new Task({ name: 'Test Task 1', user: userId1, project: projectId1 });
+        const task2 = new Task({ name: 'Test Task 2', user: userId2, project: projectId2 });
+        const task3 = new Task({ name: 'Test Task 3', user: userId1, project: projectId1 });
+        const task4 = new Task({ name: 'Test Task 4', user: userId2, project: projectId2 });
+        const task5 = new Task({ name: 'Test Task 5', user: userId1, project: projectId1 });
+        const task6 = new Task({ name: 'Test Task 6', user: userId2, project: projectId2 });
+        await task1.save();
+        await task2.save();
+        await task3.save();
+        await task4.save();
+        await task5.save();
+        await task6.save();
+    
+        // Hacer una solicitud a la primera página
+        const response = await request(app)
+          .get('/tasks?page=1')
+          .expect(200);
+    
+        // Verificar la respuesta de la página 1
+        expect(response.body.tasks).toHaveLength(5); // Debería haber 5 tareas en la página 1
+        expect(response.body.currentPage).toBe(1);
+        expect(response.body.totalPages).toBeGreaterThanOrEqual(1);
+        expect(response.body.totalTasks).toBe(6); // Total de tareas en la base de datos
+    
+        // Verificar los datos de la tarea
+        const taskResponse = response.body.tasks[0];
+        expect(taskResponse).toHaveProperty('name', 'Test Task 1');
         expect(taskResponse).toHaveProperty('user');
-        expect(taskResponse.user).toHaveProperty('name', 'Test User');
-        expect(taskResponse.user).toHaveProperty('email', 'testuser@example.com');
+        expect(taskResponse.user).toHaveProperty('name', 'Test User 1');
+        expect(taskResponse.user).toHaveProperty('email', 'testuser1@example.com');
         expect(taskResponse).toHaveProperty('project');
-        expect(taskResponse.project).toHaveProperty('name', 'Test Project');
+        expect(taskResponse.project).toHaveProperty('name', 'Test Project 1');
+    
+        // Hacer una solicitud a la segunda página
+        const responsePage2 = await request(app)
+          .get('/tasks?page=2')
+          .expect(200);
+    
+        // Verificar la respuesta de la página 2
+        expect(responsePage2.body.tasks).toHaveLength(1); // Solo debería haber 1 tarea en la página 2
+        expect(responsePage2.body.currentPage).toBe(2);
+        expect(responsePage2.body.totalPages).toBeGreaterThanOrEqual(1);
+        expect(responsePage2.body.totalTasks).toBe(6); // Total de tareas en la base de datos
+    
+        // Verificar la tarea recibida en la página 2
+        const taskResponsePage2 = responsePage2.body.tasks[0];
+        expect(taskResponsePage2).toHaveProperty('name', 'Test Task 6');
+        expect(taskResponsePage2).toHaveProperty('user');
+        expect(taskResponsePage2.user).toHaveProperty('name', 'Test User 2');
+        expect(taskResponsePage2.user).toHaveProperty('email', 'testuser2@example.com');
+        expect(taskResponsePage2).toHaveProperty('project');
+        expect(taskResponsePage2.project).toHaveProperty('name', 'Test Project 2');
       });
     });
     // --- TEST: POST /tasks ---

@@ -46,21 +46,63 @@ describe('Projects Controller', () => {
   });
 
   // Test para obtener todos los proyectos
-  it('should get all projects', async () => {
-    const project = new Project({
-      name: 'Test Project',
-      description: 'This is a test project',
-      user: user._id,
+  describe('GET /projects', () => {
+    test('debería retornar los proyectos con paginación y datos de usuario', async () => {
+      // Crear algunos proyectos de prueba en la base de datos
+      const user1 = new User({ name: 'Juan Pérez', email: 'juan.perez@example.com', password: 'Contraseña123' });
+      const user2 = new User({ name: 'Ana Gómez', email: 'ana.gomez@example.com', password: 'Contraseña123' });
+      await user1.save();
+      await user2.save();
+  
+      const project1 = new Project({ name: 'Proyecto 1', description: 'Descripción del Proyecto 1', user: user1._id });
+      const project2 = new Project({ name: 'Proyecto 2', description: 'Descripción del Proyecto 2', user: user1._id });
+      const project3 = new Project({ name: 'Proyecto 3', description: 'Descripción del Proyecto 3', user: user2._id });
+      const project4 = new Project({ name: 'Proyecto 4', description: 'Descripción del Proyecto 4', user: user2._id });
+      const project5 = new Project({ name: 'Proyecto 5', description: 'Descripción del Proyecto 5', user: user1._id });
+      const project6 = new Project({ name: 'Proyecto 6', description: 'Descripción del Proyecto 6', user: user1._id });
+      await project1.save();
+      await project2.save();
+      await project3.save();
+      await project4.save();
+      await project5.save();
+      await project6.save();
+  
+      // Hacer una solicitud a la primera página
+      const response = await request(app)
+        .get('/projects?page=1')
+        .expect(200);
+  
+      // Verificar la respuesta de la página 1
+      expect(response.body.projects).toHaveLength(5); // Debería haber 5 proyectos en la página 1
+      expect(response.body.currentPage).toBe(1);
+      expect(response.body.totalPages).toBeGreaterThanOrEqual(1);
+      expect(response.body.totalProjects).toBe(6); // Total de proyectos en la base de datos
+  
+      // Verificar los datos del proyecto
+      const projectResponse = response.body.projects[0];
+      expect(projectResponse).toHaveProperty('name', 'Proyecto 1');
+      expect(projectResponse).toHaveProperty('user');
+      expect(projectResponse.user).toHaveProperty('name', 'Juan Pérez');
+      expect(projectResponse.user).toHaveProperty('email', 'juan.perez@example.com');
+  
+      // Hacer una solicitud a la segunda página
+      const responsePage2 = await request(app)
+        .get('/projects?page=2')
+        .expect(200);
+  
+      // Verificar la respuesta de la página 2
+      expect(responsePage2.body.projects).toHaveLength(1); // Solo debería haber 1 proyecto en la página 2
+      expect(responsePage2.body.currentPage).toBe(2);
+      expect(responsePage2.body.totalPages).toBeGreaterThanOrEqual(1);
+      expect(responsePage2.body.totalProjects).toBe(6); // Total de proyectos en la base de datos
+  
+      
+      const projectResponsePage2 = responsePage2.body.projects[0];
+      expect(projectResponsePage2).toHaveProperty('name', 'Proyecto 6');
+      expect(projectResponsePage2).toHaveProperty('user');
+      expect(projectResponsePage2.user).toHaveProperty('name', 'Juan Pérez');
+      expect(projectResponsePage2.user).toHaveProperty('email', 'juan.perez@example.com');
     });
-    await project.save();
-
-    const response = await request(app)
-      .get('/projects');
-
-    expect(response.status).toBe(200);
-    expect(response.body).toBeInstanceOf(Array);
-    expect(response.body.length).toBeGreaterThan(0);
-    expect(response.body[0].name).toBe('Test Project');
   });
 
   // Test para actualizar un proyecto

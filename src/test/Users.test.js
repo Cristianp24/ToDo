@@ -164,21 +164,52 @@ describe('POST /register', () => {
   await User.deleteMany(); // Elimina todos los usuarios antes de cada prueba
 });
 
-test('debería retornar una lista de usuarios', async () => {
+test('debería retornar una lista de usuarios con paginación', async () => {
   // Crear algunos usuarios de prueba en la base de datos
   const user1 = new User({ name: 'Juan Pérez', email: 'juan.perez@example.com', password: 'Contraseña123' });
   const user2 = new User({ name: 'Ana Gómez', email: 'ana.gomez@example.com', password: 'Contraseña123' });
+  const user3 = new User({ name: 'Carlos Sánchez', email: 'carlos.sanchez@example.com', password: 'Contraseña123' });
+  const user4 = new User({ name: 'María López', email: 'maria.lopez@example.com', password: 'Contraseña123' });
+  const user5 = new User({ name: 'Pedro Ruiz', email: 'pedro.ruiz@example.com', password: 'Contraseña123' });
+  const user6 = new User({ name: 'Laura Martínez', email: 'laura.martinez@example.com', password: 'Contraseña123' });
   await user1.save();
   await user2.save();
+  await user3.save();
+  await user4.save();
+  await user5.save();
+  await user6.save();
 
+  // Hacer una solicitud a la primera página
   const response = await request(app)
-    .get('/users')
+    .get('/users?page=1')
     .expect(200);
 
-  // Verificar que la respuesta tenga 2 usuarios
-  expect(response.body).toHaveLength(2);
-  expect(response.body[0]).toHaveProperty('name', 'Juan Pérez');
-  expect(response.body[1]).toHaveProperty('name', 'Ana Gómez');
+  // Verificar la respuesta de la página 1
+  expect(response.body.users).toHaveLength(5); // Debería haber 5 usuarios en la página 1
+  expect(response.body.currentPage).toBe(1);
+  expect(response.body.totalPages).toBeGreaterThanOrEqual(1);
+  expect(response.body.totalUsers).toBe(6); // Total de usuarios en la base de datos
+
+  // Verificar los usuarios que se recibieron
+  expect(response.body.users[0]).toHaveProperty('name', 'Juan Pérez');
+  expect(response.body.users[1]).toHaveProperty('name', 'Ana Gómez');
+  expect(response.body.users[2]).toHaveProperty('name', 'Carlos Sánchez');
+  expect(response.body.users[3]).toHaveProperty('name', 'María López');
+  expect(response.body.users[4]).toHaveProperty('name', 'Pedro Ruiz');
+
+  // Hacer una solicitud a la segunda página
+  const responsePage2 = await request(app)
+    .get('/users?page=2')
+    .expect(200);
+
+  // Verificar la respuesta de la página 2
+  expect(responsePage2.body.users).toHaveLength(1); // Solo debería haber un usuario en la página 2
+  expect(responsePage2.body.currentPage).toBe(2);
+  expect(responsePage2.body.totalPages).toBeGreaterThanOrEqual(1);
+  expect(responsePage2.body.totalUsers).toBe(6); // Total de usuarios en la base de datos
+
+  // Verificar el usuario recibido en la página 2
+  expect(responsePage2.body.users[0]).toHaveProperty('name', 'Laura Martínez');
 });
         test('debería retornar un error si hay un problema al obtener los usuarios', async () => {
           // Simular un error de base de datos
