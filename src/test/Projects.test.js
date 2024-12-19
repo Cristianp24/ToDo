@@ -1,10 +1,9 @@
 const request = require('supertest');
 const mongoose = require('mongoose');
-const app = require('../app'); // Asegúrate de tener la instancia de tu aplicación en 'app.js'
+const app = require('../app'); 
 const Project = require('../models/Projects');
 const User = require('../models/Users');
 
-// Setup para limpiar la base de datos entre tests
 beforeAll(async () => {
   await mongoose.connect('mongodb://localhost:27017/yourTestDatabase');
 });
@@ -13,14 +12,14 @@ afterAll(async () => {
   await mongoose.connection.close();
 });
 
-// Setup de usuario de prueba
+
 let user;
 beforeEach(async () => {
   user = new User({ name: 'Test User', email: 'testuser@example.com', password: 'password123' });
   await user.save();
 });
 
-// Limpiar datos de la base de datos después de cada prueba
+
 afterEach(async () => {
   await Project.deleteMany({});
   await User.deleteMany({});
@@ -28,7 +27,7 @@ afterEach(async () => {
 
 describe('Projects Controller', () => {
   
-  // Test para crear un proyecto
+ 
   it('should create a project', async () => {
     const newProject = {
       name: 'Test Project',
@@ -46,7 +45,7 @@ describe('Projects Controller', () => {
     expect(response.body.project.name).toBe(newProject.name);
   });
 
-  // Test para obtener todos los proyectos
+ 
   it('should get all projects', async () => {
     const project = new Project({
       name: 'Test Project',
@@ -64,7 +63,7 @@ describe('Projects Controller', () => {
     expect(response.body[0].name).toBe('Test Project');
   });
 
-  // Test para actualizar un proyecto
+ 
   it('should update a project', async () => {
     const project = new Project({
       name: 'Test Project',
@@ -87,7 +86,7 @@ describe('Projects Controller', () => {
     expect(response.body.description).toBe(updatedProject.description);
   });
 
-  // Test para eliminar un proyecto
+  
   it('should delete a project', async () => {
     const project = new Project({
       name: 'Test Project',
@@ -106,7 +105,7 @@ describe('Projects Controller', () => {
     expect(deletedProject).toBeNull();
   });
 
-  // Test para asignar un usuario a un proyecto
+ 
   it('should assign a user to a project', async () => {
     const project = new Project({
       name: 'Test Project',

@@ -1,6 +1,6 @@
 const request = require('supertest');
 const mongoose = require('mongoose');
-const app = require('../app'); // Asegúrate de que tu app esté exportada correctamente
+const app = require('../app');
 const Task = require('../models/Tasks');
 const User = require('../models/Users');
 const Project = require('../models/Projects');
