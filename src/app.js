@@ -11,11 +11,21 @@ const cookieParser = require("cookie-parser");
 const errorHandler = require('./middlewares/errorHandler.js');
 const swaggerUi = require('swagger-ui-express');
 const specs = require('./swagger/swagger.js');
+const rateLimit = require('express-rate-limit');
 
 
 require('dotenv').config();
 
 const server = express();
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // Ventana de tiempo de 15 minutos
+  max: 100, // Límite de 100 solicitudes por IP en cada ventana de tiempo
+  standardHeaders: true, // Enviar información de límite de tasa en los encabezados estándar
+  legacyHeaders: false, // Desactivar los encabezados X-RateLimit-*
+});
+
+server.use(limiter);
 
 server.get("/", (req, res) => {
   res.send("BIENVENIDOS A MI RESTAPI DE GESTION DE TAREAS, PRUEBA TECNICA DE BACKEND");
