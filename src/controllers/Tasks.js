@@ -27,11 +27,27 @@ const createTask = async (req, res, next) => {
 
 const getTasks = async (req, res) => {
   try {
+    const page = parseInt(req.query.page) || 1; 
+    const limit = 5; 
+    const skip = (page - 1) * limit; 
+
     const tasks = await Task.find()
-      .populate('user', 'name email')
-      .populate('project', 'name');
-    res.status(200).json(tasks);
+      .populate('user', 'name email') 
+      .populate('project', 'name') 
+      .limit(limit)
+      .skip(skip);
+
+    const totalTasks = await Task.countDocuments();
+    const totalPages = Math.ceil(totalTasks / limit);
+
+    res.status(200).json({
+      tasks,
+      currentPage: page,
+      totalPages,
+      totalTasks,
+    });
   } catch (error) {
+    console.error('Error al obtener las tareas:', error);
     res.status(500).json({ message: 'Error al obtener las tareas', error });
   }
 };

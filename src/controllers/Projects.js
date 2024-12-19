@@ -30,15 +30,35 @@ const registerProject = async (req, res) => {
   }
 };
 
-  const getProjects = async (req, res) => {
-    try {
-      const projects = await Project.find().populate('user');
-      res.status(200).json(projects);
-    } catch (error) {
-      console.error('Error al obtener los proyectos:', error);
-      res.status(500).json({ message: 'Error al obtener los proyectos' });
-    }
-  };
+const getProjects = async (req, res) => {
+  try {
+    // Obtenemos el número de página desde los parámetros de consulta (query)
+    const page = parseInt(req.query.page) || 1; // Página actual (por defecto 1)
+    const limit = 5; // Número de proyectos por página
+    const skip = (page - 1) * limit; // Cálculo de los documentos a saltar
+
+    // Buscamos los proyectos con paginación
+    const projects = await Project.find()
+      .populate('user')
+      .limit(limit)
+      .skip(skip);
+
+    // Obtenemos el total de proyectos para calcular el total de páginas
+    const totalProjects = await Project.countDocuments();
+    const totalPages = Math.ceil(totalProjects / limit);
+
+    // Devolvemos la respuesta con la paginación incluida
+    res.status(200).json({
+      projects,
+      currentPage: page,
+      totalPages,
+      totalProjects,
+    });
+  } catch (error) {
+    console.error('Error al obtener los proyectos:', error);
+    res.status(500).json({ message: 'Error al obtener los proyectos' });
+  }
+};
 
 
   const updateProject = async (req, res) => {

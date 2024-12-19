@@ -7,10 +7,30 @@ const CustomError = require('../middlewares/customError');
 
 const getUsers = async (req, res) => {
   try {
-    const users = await User.find();
-    res.status(200).json(users);
+    // Obtenemos el número de página desde los parámetros de consulta (query)
+    const page = parseInt(req.query.page) || 1; // Página actual (por defecto 1)
+    const limit = 5; // Número de usuarios por página
+    const skip = (page - 1) * limit; // Cálculo de los usuarios a saltar
+
+    // Buscamos los usuarios con paginación
+    const users = await User.find()
+      .limit(limit)
+      .skip(skip);
+
+    // Obtenemos el total de usuarios para calcular el total de páginas
+    const totalUsers = await User.countDocuments();
+    const totalPages = Math.ceil(totalUsers / limit);
+
+    // Devolvemos la respuesta con la paginación incluida
+    res.status(200).json({
+      users,
+      currentPage: page,
+      totalPages,
+      totalUsers,
+    });
   } catch (error) {
-    res.status(500).json({ message: 'Error al obtener los usuarios' });
+    console.error('Error al obtener los usuarios:', error);
+    res.status(500).json({ message: 'Error al obtener los usuarios', error });
   }
 };
 
